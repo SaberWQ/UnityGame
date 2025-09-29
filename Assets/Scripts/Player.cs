@@ -11,9 +11,12 @@ public class Player : MonoBehaviour
     [SerializeField] private float leftForce;
     [SerializeField] private GameObject[] Hearts = new GameObject[5];
     [SerializeField] private TMP_Text gameOver;
-  
 
     private int countHearts = 4;
+
+    private bool isJump;
+    private bool isIdle;
+    private bool isRunning;
 
     private bool isLeft = false;
     private bool isGround = false;
@@ -33,6 +36,8 @@ public class Player : MonoBehaviour
         Flip();
         PlayerDeath();
 
+
+
     }
 
 
@@ -42,12 +47,36 @@ public class Player : MonoBehaviour
         moveVector.x = Input.GetAxis("Horizontal");
         rb.linearVelocity = new Vector2(moveVector.x * speed, rb.linearVelocity.y);
         animator.SetFloat("moveVector", Mathf.Abs(moveVector.x));
+        if (moveVector.x == 0)
+        {
+            isRunning = false;
+            isIdle = true;
+            animator.SetBool("isRunning", isRunning);
+            animator.SetBool("isIdle", isIdle);
+        }
+        else
+        {
+            isRunning = true;
+            isIdle = false;
+            animator.SetBool("isRunning", isRunning);
+            animator.SetBool("isIdle", isIdle);
+        }
     }
+
+
 
     private void Jump()
     {
         if (Input.GetKeyDown(KeyCode.Space) && isGround)
+        {
+            isJump = true;
+            isRunning = false;
+            isIdle = false;
             rb.AddForce(Vector2.up * jumpForce);
+            animator.SetBool("isJump", isJump);
+            animator.SetBool("isRunning", isRunning);
+            animator.SetBool("isIdle", isIdle);
+        }
     }
 
     private void Flip()
@@ -62,13 +91,29 @@ public class Player : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.collider.CompareTag("ground"))
+        {
             isGround = true;
+            animator.SetBool("isGround", isGround);
+
+            isJump = false; 
+            animator.SetBool("isJump", isJump);
+            }
+            
+
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.collider.CompareTag("ground"))
+        {
             isGround = false;
+            animator.SetBool("isGround", isGround);
+            
+            isJump = true; 
+            animator.SetBool("isJump", isJump);
+            }
+                    
+
     }
 
 
